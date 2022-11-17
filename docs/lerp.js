@@ -2561,12 +2561,6 @@ var ASM_CONSTS = {
           const ctx = ptrk_get_object_from_id(ctxID);
           ctx.lineWidth = width;
       }
-
-  function _ptrk_request_animation_frame() {
-          window.requestAnimationFrame(() => {
-              clear_and_draw();
-          });
-      }
 embind_init_charCodes();
 BindingError = Module['BindingError'] = extendError(Error, 'BindingError');;
 InternalError = Module['InternalError'] = extendError(Error, 'InternalError');;
@@ -2606,8 +2600,7 @@ var asmLibraryArg = {
   "ptrk_canvas_onSave": _ptrk_canvas_onSave,
   "ptrk_canvas_setColor": _ptrk_canvas_setColor,
   "ptrk_canvas_setLinearGradient": _ptrk_canvas_setLinearGradient,
-  "ptrk_canvas_setStrokeWidth": _ptrk_canvas_setStrokeWidth,
-  "ptrk_request_animation_frame": _ptrk_request_animation_frame
+  "ptrk_canvas_setStrokeWidth": _ptrk_canvas_setStrokeWidth
 };
 var asm = createWasm();
 /** @type {function(...*):?} */
@@ -2626,10 +2619,10 @@ var ___errno_location = Module["___errno_location"] = createExportWrapper("__err
 var _fflush = Module["_fflush"] = createExportWrapper("fflush");
 
 /** @type {function(...*):?} */
-var _free = Module["_free"] = createExportWrapper("free");
+var _malloc = Module["_malloc"] = createExportWrapper("malloc");
 
 /** @type {function(...*):?} */
-var _malloc = Module["_malloc"] = createExportWrapper("malloc");
+var _free = Module["_free"] = createExportWrapper("free");
 
 /** @type {function(...*):?} */
 var _emscripten_stack_init = Module["_emscripten_stack_init"] = function() {
