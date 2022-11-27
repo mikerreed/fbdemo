@@ -56,6 +56,10 @@ class Textline2Content : public Content {
 
         m_axes = m_font->axes();
         m_tline.reset(new KeyFrames((int)m_axes.size()));
+        if (m_slider) {
+            m_slider->value(0);
+            m_slider->setTicks({nullptr, 0});
+        }
     }
     
     void updateTicks() {
@@ -106,6 +110,8 @@ class Textline2Content : public Content {
     
     bool clearKeyFrames(const Meta& m, Meta*) {
         if (auto duration = m.findFloat("duration")) {
+            m_slider->value(0);
+            m_slider->setTicks({nullptr, 0});
             this->setDuration(duration);
             m_tline->removeAll();
             this->updateTicks();
@@ -255,7 +261,7 @@ public:
         pnt.width(2.25);
 
         canvas->save();
-        canvas->translate(50, 500);
+        canvas->translate(50, 450);
         for (size_t i = 0; i < paths.size(); ++i) {
             canvas->drawPath(paths[i], paint);
             if (m_showOutlines) {

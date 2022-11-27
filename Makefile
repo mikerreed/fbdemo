@@ -7,10 +7,12 @@ PORTS = ports/*.cpp
 
 ECMA = ecma/lerp.cpp ecma/jsc2d_canvas.cpp third_party/externals/harfbuzz/src/harfbuzz.cc
 
+FLAGS = -O2 -DNDEBUG
+
 INC = -I. -Ithird_party/externals/harfbuzz/src
 
 lerp : $(ECMA)
-	emcc -lembind -o docs/lerp.js $(ECMA) $(INC) $(SRC) $(PORTS) --js-library ecma/lerp_lib.js --post-js ecma/lerp_post_lib.js
+	emcc $(FLAGS) -lembind -o docs/lerp.js $(ECMA) $(INC) $(SRC) $(PORTS) --js-library ecma/lerp_lib.js --post-js ecma/lerp_post_lib.js
 	cp ecma/mylerp.html docs/index.html
 	cp ecma/pentrek_utils.js docs/
 
