@@ -1,0 +1,20 @@
+To build the demo...
+
+1. Install harfbuzz into 'third_party/externals/harfbuzz'
+
+e.g. > mkdir third_party
+     > cd third_party
+     > mkdir externals
+     > cd externals
+     > git clone git@github.com:harfbuzz/harfbuzz.git
+
+This only needs to be done once, but it is not checked in as part of
+this repo, so it must be done if you want to rebuild from sources.
+
+
+2. > make
+
+This should build everything, and copy the necessary files into docs/
+
+You need to have the embind tools installed for this to build.
+
