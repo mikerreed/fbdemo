@@ -62,7 +62,17 @@ void JSC2DCanvas::onUpdateShader(const Shader& sh, bool isStroke) {
                                           info.m_points, arrays.m_colors, arrays.m_pos,
                                           info.m_colors.size(), isStroke);
         } break;
+        case Shader::Type::kRadialGradient: {
+            Shader::RadialGradientInfo info;
+            sh.asRadialGradient(&info);
+            GradientArrays arrays(info.m_colors, info.m_pos);
+            ptrk_canvas_setRadialGradient(m_c2d,
+                                          info.m_center.x, info.m_center.y, info.m_radius,
+                                          arrays.m_colors, arrays.m_pos, info.m_colors.size(),
+                                          isStroke);
+        } break;
         default:
+            printf("Unexpected shader type %d\n", sh.type());
             assert(false);
             break;
     }

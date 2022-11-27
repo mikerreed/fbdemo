@@ -5,6 +5,7 @@
 #ifndef _pentrek_fonts_h_
 #define _pentrek_fonts_h_
 
+#include "include/data.h"
 #include "include/refcnt.h"
 #include "include/path.h"
 #include <array>
@@ -75,16 +76,19 @@ public:
 
     // Static Factories
     
-    static rcp<Font> MakeCG(Span<const uint8_t>);
+    static rcp<Font> MakeCG(rcp<Data>);
+    static rcp<Font> MakeHB(rcp<Data>);
+    static rcp<Font> Make(rcp<Data>);
 
     enum GlobalFonts {
         kPentrek,
         kDecovar,
+        kMigha,
         
         kDefault = kPentrek,
-        kLastGlobalFont = kDecovar,
+        kLastGlobalFont = kMigha,
     };
-    static Span<const uint8_t> GlobalData(GlobalFonts);
+    static rcp<Data> GlobalData(GlobalFonts);
 
 protected:
     // If you're creating a new coord/style of the same underlying font/typeface,

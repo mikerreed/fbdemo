@@ -122,15 +122,19 @@ void Slider::onDraw(Canvas* canvas) {
     };
 
     if (m_ticks.size() > 0) {
+        PathBuilder builder;
+        builder.incReserve(m_ticks.size()*2, m_ticks.size()*2);
+
         paint.color(kSliderTickColor);
         paint.width(kSliderTickWidth);
         for (auto t : m_ticks) {
             if (t >= m_min && t <= m_max) {
                 auto x = mapx(t);
-                canvas->drawLine({x, cy - kSliderTickHeight/2},
-                                 {x, cy + kSliderTickHeight/2}, paint);
+                builder.addLine({x, cy - kSliderTickHeight/2},
+                                {x, cy + kSliderTickHeight/2});
             }
         }
+        canvas->drawPath(builder.detach(), paint);
 
     }
     
@@ -370,31 +374,6 @@ std::unique_ptr<Click> CubicInterpView::onFindClick(Point p) {
 
 void Content::requestDraw() {
     Content::RequestDraw(this);
-}
-
-void Content::draw(Canvas* canvas) {
-    canvas->save();
-    this->onDraw(canvas);
-    canvas->restore();
-
-    if (m_child) {
-        m_child->draw(canvas);
-    }
-    
-    if (false) {
-        Paint p;
-        p.color({1, 0, 0, 0.025f});
-        canvas->drawRect(this->bounds(), p);
-    }
-}
-
-std::unique_ptr<Click> Content::findClick(Point p) {
-    if (m_child) {
-        if (auto cl = m_child->findClick(p)) {
-            return cl;
-        }
-    }
-    return this->onFindClick(p);
 }
 
 void Content::handleHover(Point p) {

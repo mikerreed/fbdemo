@@ -20,7 +20,9 @@ public:
     static rcp<Data> Uninitialized(size_t size);
     static rcp<Data> Copy(Span<const uint8_t>);
     static rcp<Data> Managed(Span<const uint8_t>, FreeProc, void* clientData);
+    static rcp<Data> FromMalloc(Span<const uint8_t>);
     static rcp<Data> Unmanaged(Span<const uint8_t>);
+    static rcp<Data> File(const char path[]);
     
     size_t size() const { return m_buffer.size(); }
     const void* data() const { return m_buffer.data(); }

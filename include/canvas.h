@@ -99,7 +99,14 @@ public:
             }
         }
         ~AutoRestore() {
-            m_canvas->restoreToCount(m_prevSaveCount);
+            this->restore();
+        }
+        
+        void restore() {
+            if (m_canvas) {
+                m_canvas->restoreToCount(m_prevSaveCount);
+                m_canvas = nullptr;
+            }
         }
     };
 

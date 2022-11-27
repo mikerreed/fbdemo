@@ -3,6 +3,7 @@
  */
 
 #include "include/canvas.h"
+#include "include/meta.h"
 #include "include/views.h"
 
 using namespace pentrek;
@@ -10,7 +11,27 @@ using namespace pentrek;
 void View::draw(Canvas* canvas) {
     Canvas::AutoRestore acr(canvas);
     canvas->translate(m_positionInParent);
-    this->onDraw(canvas);
+
+    {
+        Canvas::AutoRestore acr2(canvas);
+        this->onDraw(canvas);
+    }
+    {
+        Canvas::AutoRestore acr3(canvas);
+        this->onDrawChildren(canvas);
+    }
+}
+
+std::unique_ptr<Click> View::findClick(Point p) {
+    p -= m_positionInParent;
+    if (auto c = this->onFindChildrenClick(p)) {
+        return c;
+    }
+    return this->onFindClick(p);
+}
+
+bool View::handleMsg(const Meta& msg, Meta* reply) {
+    return this->onHandleMsg(msg, reply);
 }
 
 //////////////////////////////
@@ -24,7 +45,7 @@ int GroupView::findChild(View* view) const {
     return -1;
 }
 
-View* GroupView::insertChild(size_t index, std::unique_ptr<View> child) {
+View* GroupView::insertChildView(size_t index, std::unique_ptr<View> child) {
     assert(child->parent() == nullptr);
     child->parent(this);
 
@@ -34,14 +55,6 @@ View* GroupView::insertChild(size_t index, std::unique_ptr<View> child) {
     this->onChildAdded(ptr, index);
     
     return this->childAt(index); // can't use 'child' after its been moved
-}
-
-View* GroupView::addChildToFront(std::unique_ptr<View> child) {
-    return this->insertChild(0, std::move(child));
-}
-
-View* GroupView::addChildToBack(std::unique_ptr<View> child) {
-    return this->insertChild(m_children.size(), std::move(child));
 }
 
 std::unique_ptr<View> GroupView::detachChild(size_t index) {
@@ -54,7 +67,19 @@ std::unique_ptr<View> GroupView::detachChild(size_t index) {
     return child;
 }
 
-void GroupView::onDraw(Canvas* canvas) {
+void GroupView::deleteAllChildren() {
+    while (m_children.size()) {
+        size_t n = m_children.size();
+
+        // we allow the returned child to delete itself
+        (void)this->detachChild(n - 1);
+        
+        // make sure our subclass isn't re-adding children while we do this loop
+        assert(m_children.size() == n - 1);
+    }
+}
+
+void GroupView::onDrawChildren(Canvas* canvas) {
     auto iter = m_children.begin();
     auto stop = m_children.end();
     for (; iter != stop; ++iter) {
@@ -62,7 +87,7 @@ void GroupView::onDraw(Canvas* canvas) {
     }
 }
 
-std::unique_ptr<Click> GroupView::onFindClick(Point p) {
+std::unique_ptr<Click> GroupView::onFindChildrenClick(Point p) {
     // visit front-to-back
     auto iter = m_children.rbegin();
     auto stop = m_children.rend();

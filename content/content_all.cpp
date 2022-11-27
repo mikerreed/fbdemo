@@ -17,7 +17,7 @@ std::unique_ptr<Content> MakeEnvelopeContent();
 std::unique_ptr<Content> MakeCubicUnitContent();
 std::unique_ptr<Content> MakeInnerOuterContent();
 std::unique_ptr<Content> MakeKeyFramesContent();
-std::unique_ptr<Content> MakeTextlineContent();
+std::unique_ptr<Content> MakeTextline2Content();
 std::unique_ptr<Content> MakeMouseOverContent();
 std::unique_ptr<Content> MakeTextOnPathContent();
 std::unique_ptr<Content> MakeSnakeContent();
@@ -25,8 +25,8 @@ std::unique_ptr<Content> MakeSnakeContent();
 using ContentMaker = std::unique_ptr<pentrek::Content> (*)();
 
 const ContentMaker makers[] = {
-    MakeScribble,
 #ifdef PENTREK_BUILD_FOR_APPLE
+    MakeScribble,
     MakeFollowPath,
     MakeTrimContent,
     MakeDashContent,
@@ -38,12 +38,13 @@ const ContentMaker makers[] = {
     MakeTextContent,
     MakeEnvelopeContent,
     MakeKeyFramesContent,
-    MakeTextlineContent,
+    MakeTextline2Content,
     MakeMouseOverContent,
     MakeTextOnPathContent,
 
     MakeSnakeContent,
 #endif
+    MakeTextline2Content,
 };
 
 int Content::Count() { return ArrayCount(makers); }

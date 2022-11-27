@@ -1,10 +1,10 @@
 
 mergeInto(LibraryManager.library, {
     // some of these rely on functions in lerp_post_lib.js
-    
+
     ptrk_request_animation_frame: function() {
-        window.requestAnimationFrame(() => {
-            clear_and_draw();
+        window.requestAnimationFrame((timestamp) => {
+            clear_and_draw(timestamp);
         });
     },
 
@@ -15,6 +15,23 @@ mergeInto(LibraryManager.library, {
         const pos = new Float32Array(Module.HEAPF32.buffer, posptr, ncolors);
         
         const grad = ctx.createLinearGradient(pts[0], pts[1], pts[2], pts[3]);
+        for (i = 0; i < ncolors; ++i) {
+            grad.addColorStop(pos[i], ptrk_util_color32_to_string(clr[i]));
+        }
+        
+        if (isStroke != 0) {
+            ctx.strokeStyle = grad;
+        } else {
+            ctx.fillStyle = grad;
+        }
+    },
+
+    ptrk_canvas_setRadialGradient: function(ctxID, cx, cy, radius, colorsptr, posptr, ncolors, isStroke) {
+        const ctx = ptrk_get_object_from_id(ctxID);
+        const clr = new Uint32Array( Module.HEAPU32.buffer, colorsptr, ncolors);
+        const pos = new Float32Array(Module.HEAPF32.buffer, posptr, ncolors);
+        
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
         for (i = 0; i < ncolors; ++i) {
             grad.addColorStop(pos[i], ptrk_util_color32_to_string(clr[i]));
         }

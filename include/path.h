@@ -110,6 +110,8 @@ public:
         Rec next();
     };
     
+    void dump() const;  // printf debugging
+
     void writeSVGString(Writer*) const;
     rcp<Data> asSVGData() const;
 

@@ -6,6 +6,7 @@
 #define _pentrek_color_h_
 
 #include "include/math.h"
+#include "include/span.h"
 
 namespace pentrek {
 
@@ -36,8 +37,8 @@ struct Color {
     
     Color32 color32() const;
     
-    float* floats() { return &r; }
-    const float* floats() const { return &r; }
+    Span<float> floats() { return {&r, 4}; }
+    Span<const float> floats() const { return {&r, 4}; }
     
     Color pinToUnit() const {
         return {pin_to_unit(r), pin_to_unit(g), pin_to_unit(b), pin_to_unit(a)};

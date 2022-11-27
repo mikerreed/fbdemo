@@ -148,12 +148,10 @@ private:
     bool m_enabled = true;
 };
 
-class Content {
+class Content : public GroupView {
     Size m_size;
     std::string m_title;
     double m_absSecs = 0;
-
-    View* m_child = nullptr;
 
     static void RequestDraw(Content*);
 
@@ -178,10 +176,6 @@ public:
     }
     
     void setTitle(std::string s) { m_title = s; }
-    
-    void draw(Canvas* canvas);
-
-    std::unique_ptr<Click> findClick(Point p);
 
     bool keyDown(const KeyEvent& e) {
     //    printf("keydown:%c %d code:%d %x\n", e.uni(), e.raw(), e.code(), e.modi());
@@ -192,9 +186,6 @@ public:
     void setAbsTime(double secs) {
         m_absSecs = secs;
     }
-
-    View* getContentChild() const { return m_child; }
-    void setContentChild(View* ch) { m_child = ch; }
     
     void handleHover(Point);
 
@@ -204,9 +195,6 @@ public:
     static std::unique_ptr<Content> Make(int);
 
 protected:
-    virtual void onDraw(Canvas*) {}
-    virtual void onSizeChanged() {}
-    virtual std::unique_ptr<Click> onFindClick(Point) { return nullptr; }
     virtual bool onKeyDown(const KeyEvent&);
     virtual void onHover(Point) {}
 };

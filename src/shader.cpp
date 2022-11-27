@@ -39,7 +39,7 @@ public:
         m_count = colors.size();
         size_t extraColors = (pos ? align_4(m_count) : 0);
         Color* copy = new Color[m_count + extraColors];
-        float* posCopy = pos ? copy[m_count].floats() : nullptr;
+        float* posCopy = pos ? copy[m_count].floats().data() : nullptr;
         for (size_t i = 0; i < m_count; ++i) {
             copy[i] = colors[i];
             if (posCopy) {

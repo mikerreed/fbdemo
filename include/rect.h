@@ -53,8 +53,8 @@ struct Rect {
     }
     bool operator!=(const Rect& o) const { return !(*this == o); }
 
-    float* floats() { return &left; }
-    const float* floats() const { return &left; }
+    Span<float> floats() { return {&left, 4}; }
+    Span<const float> floats() const { return {&left, 4}; }
 
     Rect& operator=(const IRect& r) {
         left = (float)r.left;

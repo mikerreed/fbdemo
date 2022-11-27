@@ -3,6 +3,7 @@
  */
 
 #include "include/data.h"
+#include <stdio.h>
 
 using namespace pentrek;
 
@@ -24,6 +25,10 @@ static void newarray_freeproc(void* buffer, size_t, void*) {
     delete[] (uint8_t*)buffer;;
 }
 
+static void frommalloc_freeproc(void* buffer, size_t, void*) {
+    ::free(buffer);
+}
+
 rcp<Data> Data::Empty() {
     static Data* gEmptyData;
     if (!gEmptyData) {
@@ -35,6 +40,10 @@ rcp<Data> Data::Empty() {
 rcp<Data> Data::Managed(Span<const uint8_t> buffer, FreeProc proc, void* client) {
     uint8_t* data = const_cast<uint8_t*>(buffer.data());
     return rcp<Data>(new Data(Span{data, buffer.size()}, proc, client));
+}
+
+rcp<Data> Data::FromMalloc(Span<const uint8_t> buffer) {
+    return Managed(buffer, frommalloc_freeproc, nullptr);
 }
 
 rcp<Data> Data::Unmanaged(Span<const uint8_t> buffer) {
@@ -55,6 +64,21 @@ rcp<Data> Data::Uninitialized(size_t size) {
 rcp<Data> Data::Copy(Span<const uint8_t> src) {
     auto data = Uninitialized(src.size());
     memcpy(data->writable_data(), src.data(), src.size());
+    return data;
+}
+
+rcp<Data> Data::File(const char path[]) {
+    FILE* f = fopen(path, "rb");
+    if (!f) {
+        return nullptr;
+    }
+
+    fseek(f, 0, SEEK_END);
+    size_t size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    auto data = Data::Uninitialized(size);
+    fread(data->writable_data(), size, 1, f);
+    fclose(f);
     return data;
 }
 

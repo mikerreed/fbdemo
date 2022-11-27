@@ -6,6 +6,7 @@
 #define _pentrek_point_h_
 
 #include "include/size.h"
+#include "include/span.h"
 
 namespace pentrek {
 
@@ -30,8 +31,8 @@ struct IPoint {
 struct Point {
     float x, y;
     
-    float* floats() { return &x; }
-    const float* floats() const { return &x; }
+    Span<float> floats() { return {&x, 2}; }
+    Span<const float> floats() const { return {&x, 2}; }
     
     Point operator-() const { return {-x, -y}; }
 

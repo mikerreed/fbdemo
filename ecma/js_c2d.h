@@ -20,6 +20,10 @@ extern "C" {
                                               const Point[/* 2 */],
                                               const Color32[], const float pos[],
                                               int count, bool isStroke);
+    extern void ptrk_canvas_setRadialGradient(C2DContextID,
+                                              float cx, float cy, float radius,
+                                              const Color32[], const float pos[],
+                                              int count, bool isStroke);
     extern void ptrk_canvas_setColor(C2DContextID, Color32, bool isStroke);
     extern void ptrk_canvas_setStrokeWidth(C2DContextID, float width);
 

@@ -7,6 +7,7 @@
 // for utils
 #include "include/data.h"
 #include "include/writer.h"
+#include <stdio.h>
 
 namespace pentrek {
 
@@ -178,13 +179,45 @@ rcp<Path> Path::Lerp(const Path* a, const Path* b, float t) {
 
 // Utilities
 
+void Path::dump() const {
+    Iter iter(*this);
+    while (auto r = iter.next()) {
+        switch (r.vrb) {
+            case PathVerb::move: printf("b.move({%g,%g});\n", r.pts[0].x, r.pts[0].y); break;
+            case PathVerb::line: printf("b.line({%g,%g});\n", r.pts[1].x, r.pts[1].y); break;
+            case PathVerb::quad:
+                printf("b.quad({%g,%g}, {%g,%g});\n",
+                       r.pts[1].x, r.pts[1].y, r.pts[2].x, r.pts[2].y);
+                break;
+            case PathVerb::cubic:
+                printf("b.cubic({%g,%g}, {%g,%g}, {%g,%g});\n",
+                       r.pts[00].x, r.pts[0].y, r.pts[1].x, r.pts[2].y, r.pts[2].x, r.pts[2].y);
+                break;
+            case PathVerb::close: printf("b.close();\n"); break;
+        }
+    }
+}
+
 void Path::writeSVGString(Writer* w) const {
-    this->visit([&](const Point m[]) { w->writef("M%g,%g", m[0].x, m[0].y); },
-                [&](const Point l[]) { w->writef("L%g,%g", l[0].x, l[0].y); },
-                [&](const Point q[]) { w->writef("Q%g,%g %g,%g", q[0].x, q[0].y, q[1].x, q[1].y); },
-                [&](const Point c[]) { w->writef("C%g,%g %g,%g %g,%g",
-                                                 c[0].x, c[0].y, c[1].x, c[1].y, c[2].x, c[2].y); },
-                [&](Point, Point)    { w->write("Z"); });
+    Iter iter(*this);
+    while (const auto r = iter.next()) {
+        switch (r.vrb) {
+            case PathVerb::move: w->writef("M%g,%g", r.pts[0].x, r.pts[0].y); break;
+            case PathVerb::line: w->writef("L%g,%g", r.pts[1].x, r.pts[1].y); break;
+            case PathVerb::quad:
+                w->writef("Q%g,%g %g,%g",
+                          r.pts[1].x, r.pts[1].y,
+                          r.pts[2].x, r.pts[2].y);
+                break;
+            case PathVerb::cubic:
+                w->writef("C%g,%g %g,%g %g,%g",
+                          r.pts[1].x, r.pts[1].y,
+                          r.pts[2].x, r.pts[2].y,
+                          r.pts[3].x, r.pts[3].y);
+                break;
+            case PathVerb::close: w->write("Z"); break;
+        }
+    }
 }
 
 rcp<Data> Path::asSVGData() const {

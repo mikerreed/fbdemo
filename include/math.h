@@ -9,6 +9,18 @@
 
 namespace pentrek {
 
+template <typename T> T align_2(T value) {
+    return (value + 1) & ~0x1;
+}
+
+template <typename T> T align_4(T value) {
+    return (value + 3) & ~0x3;
+}
+
+template <typename T> T align_8(T value) {
+    return (value + 7) & ~0x7;
+}
+
 constexpr float kDefaultUnitTolerance = 1.0f / 65536;
 
 static inline float round_to_float(float x) {
