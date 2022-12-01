@@ -64,7 +64,7 @@ struct Matrix {
         return m[i];
     }
     
-    bool invert(Matrix* dst) const;
+    PENTREK_WARN_UNUSED_RESULT bool invert(Matrix* dst) const;
     Matrix invertOrIdentity() const;
 
     Matrix operator*(const Matrix& o) const {

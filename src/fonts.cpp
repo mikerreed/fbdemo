@@ -33,8 +33,8 @@ Font::~Font() {
 //    printf("~ %d fonts, %d in cache\n", gFontCounter, gGlobalFontCacheCounter);
 }
 
-std::vector<Font::Coord> Font::CanonicalCoord(Span<const Axis> axes, Span<const Coord> src) {
-    std::vector<Coord> dst(axes.size());
+Array<Font::Coord> Font::CanonicalCoord(Span<const Axis> axes, Span<const Coord> src) {
+    Array<Coord> dst(axes.size());
 
     for (size_t i = 0; i < axes.size(); ++i) {
         auto iter = std::find_if(src.begin(), src.end(), [&](Coord c) {
@@ -50,7 +50,7 @@ std::vector<Font::Coord> Font::CanonicalCoord(Span<const Axis> axes, Span<const 
     return dst;
 }
 
-std::vector<Font::Coord> Font::canonicalCoord(Span<const Coord> src) const {
+Array<Font::Coord> Font::canonicalCoord(Span<const Coord> src) const {
     auto axes = this->axes();
     return CanonicalCoord(axes, src);
 }
@@ -64,6 +64,11 @@ rcp<Font> Font::makeAt(Span<const Coord> src) const {
         return ref_rcp(this);
     }
     return this->onMakeAt(dst);
+}
+
+Font::LineMetrics Font::lineMetrics() const {
+    // todo: this should be overriden in subclasses
+    return {-1, 0.25f};
 }
 
 #ifdef DEBUG

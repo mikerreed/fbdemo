@@ -197,8 +197,6 @@ void dispatch_set_keyframe(float time, uintptr_t tagsPtr, uintptr_t valsPtr, siz
     const int32_t* tags = (const int32_t*)tagsPtr;
     const float*   vals = (const float*  )valsPtr;
 
-    printf("set_keyframe time:%g [%zu]\n", time, N);
-
     Meta m("set-var-keyframe");
     m.setFloat("time", time);
     m.setInts("tags", {tags, N});
@@ -272,6 +270,18 @@ void dispatch_set_text_size(float size) {
     gHost->content()->handleMsg(msg);
 }
 
+void dispatch_set_anim_speed(float speed) {
+    Meta msg("set-anim-speed");
+    msg.setFloat("speed", speed);
+    gHost->content()->handleMsg(msg);
+}
+
+void dispatch_play_pause_animation(bool doPlay) {
+    Meta msg("play-pause-animation");
+    msg.setInt("play", doPlay);
+    gHost->content()->handleMsg(msg);
+}
+
 EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("create_host", &dispatch_create_host, emscripten::allow_raw_pointers());
 
@@ -286,6 +296,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("dispatch_show_outlines", &dispatch_show_outlines);
     emscripten::function("dispatch_set_rgba", &dispatch_set_rgba);
     emscripten::function("dispatch_set_text_size", &dispatch_set_text_size);
+    emscripten::function("dispatch_set_anim_speed", &dispatch_set_anim_speed);
+    emscripten::function("dispatch_play_pause_animation", &dispatch_play_pause_animation);
 
     emscripten::function("dispatch_get_font_axes_json", &dispatch_get_font_axes_json);
 

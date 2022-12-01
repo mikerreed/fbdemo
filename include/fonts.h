@@ -5,6 +5,7 @@
 #ifndef _pentrek_fonts_h_
 #define _pentrek_fonts_h_
 
+#include "include/array.h"
 #include "include/data.h"
 #include "include/refcnt.h"
 #include "include/path.h"
@@ -24,8 +25,9 @@ struct GlyphRun {
     rcp<Font> m_font;
     float     m_size;
   
-    std::vector<GlyphID> m_glyphs;  // N
-    std::vector<float> m_xpos;      // N+1
+    Array<GlyphID>  m_glyphs;     // N
+    Array<float>    m_xpos;       // N+1
+    Array<uint32_t> m_textIndex;  // N
 };
 
 class Font : public RefCnt {
@@ -54,15 +56,20 @@ public:
     uint32_t baseID() const { return m_baseID; }
     Span<const Coord> coord() const { return m_coord; }
 
-    static std::vector<Font::Coord> CanonicalCoord(Span<const Axis>, Span<const Coord>);
+    static Array<Font::Coord> CanonicalCoord(Span<const Axis>, Span<const Coord>);
 
-    std::vector<Coord> canonicalCoord(Span<const Coord> coord) const;
+    Array<Coord> canonicalCoord(Span<const Coord> coord) const;
 
+    struct LineMetrics {
+        float m_ascent;  // < 0
+        float m_descent; // > 0
+    };
+    virtual LineMetrics lineMetrics() const;
     virtual rcp<Path> glyphPath(GlyphID) const = 0;
-    virtual std::vector<GlyphRun> shapeText(Span<const Unichar>,
+    virtual Array<GlyphRun> shapeText(Span<const Unichar>,
                                             Span<const TextRun>) const = 0;
     
-    virtual std::vector<Axis> axes() const = 0;
+    virtual Array<Axis> axes() const = 0;
     int axesCount() const { return castTo<int>(this->axes().size()); }
 
     rcp<Font> makeAt(Span<const Coord>) const;
@@ -103,7 +110,7 @@ protected:
 
 private:
     const uint32_t m_baseID;
-    const std::vector<Coord> m_coord;
+    const Array<Coord> m_coord;
 };
 
 static inline std::array<char, 5> tag_to_str(uint32_t tag) {

@@ -9,7 +9,7 @@
 #include <mutex>
 
 #ifdef PENTREK_BUILD_FOR_APPLE
-//    #define USE_MAC_FONTS
+    #define USE_MAC_FONTS
 #endif
 
 using namespace pentrek;

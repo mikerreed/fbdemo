@@ -62,7 +62,7 @@ static hb_blob_t* data_to_blob(rcp<Data> data) {
 class FontHB : public Font {
     hb_font_t*        m_font;
     hb_draw_funcs_t*  m_draw_funcs;
-    std::vector<Axis> m_axes;
+    Array<Axis>       m_axes;
     const float       m_invUpem;
 
 public:
@@ -72,9 +72,8 @@ public:
     hb_font_t* hbFont() const { return m_font; }
     
     rcp<Path> glyphPath(GlyphID) const override;
-    std::vector<GlyphRun> shapeText(Span<const Unichar>,
-                                    Span<const TextRun>) const override;
-    std::vector<Axis> axes() const override { return m_axes; }
+    Array<GlyphRun> shapeText(Span<const Unichar>, Span<const TextRun>) const override;
+    Array<Axis> axes() const override { return m_axes; }
 
 protected:
     rcp<Font> onMakeAt(Span<const Coord>) const override;
@@ -140,9 +139,11 @@ static float set_grun(hb_buffer_t* buffer, GlyphRun* grun, float scale, float or
 
     grun->m_glyphs.resize(length);
     grun->m_xpos.resize(length + 1);
+    grun->m_textIndex.resize(length);
     for (auto i = 0; i < length; ++i) {
         grun->m_glyphs[i] = castTo<GlyphID>(info[i].codepoint);
         grun->m_xpos[i] = origin;
+        grun->m_textIndex[i] = castTo<uint32_t>(info[i].cluster);
 
         origin += pos[i].x_advance * scale;
     }
@@ -150,8 +151,7 @@ static float set_grun(hb_buffer_t* buffer, GlyphRun* grun, float scale, float or
     return origin;
 }
 
-std::vector<GlyphRun> FontHB::shapeText(Span<const Unichar> text,
-                                        Span<const TextRun> truns) const {
+Array<GlyphRun> FontHB::shapeText(Span<const Unichar> text, Span<const TextRun> truns) const {
     const hb_feature_t features[] = {
         LigatureOn, KerningOn, CligOn,
     };
@@ -162,7 +162,7 @@ std::vector<GlyphRun> FontHB::shapeText(Span<const Unichar> text,
         return ((const FontHB*)&font)->m_font;
     };
 
-    std::vector<GlyphRun> gruns;
+    Array<GlyphRun> gruns;
 
     unsigned textOffset = 0;
     float origin = 0;
@@ -190,7 +190,7 @@ std::vector<GlyphRun> FontHB::shapeText(Span<const Unichar> text,
 }
 
 rcp<Font> FontHB::onMakeAt(Span<const Coord> coord) const {
-    std::vector<float> values(coord.size());
+    Array<float> values(coord.size());
     for (size_t i = 0; i < coord.size(); ++i) {
         values[i] = coord[i].value;
     }
@@ -220,12 +220,12 @@ rcp<Font> Font::MakeHB(rcp<Data> data) {
         return fail("creating face");
     }
 
-    std::vector<Font::Axis> axes;
-    std::vector<Font::Coord> coord;
+    Array<Font::Axis> axes;
+    Array<Font::Coord> coord;
 
     const unsigned axisCount = hb_ot_var_get_axis_count(face);
     if (axisCount > 0) {
-        std::vector<hb_ot_var_axis_info_t> infos(axisCount);
+        Array<hb_ot_var_axis_info_t> infos(axisCount);
         unsigned acount = axisCount;
         DEBUG_CODE(unsigned n =) hb_ot_var_get_axis_infos(face, 0, &acount, infos.data());
         assert(n == axisCount);

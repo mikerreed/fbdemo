@@ -37,6 +37,10 @@ struct Color {
     
     Color32 color32() const;
     
+    PENTREK_WARN_UNUSED_RESULT Color withAlpha(float newA) const {
+        return {r, g, b, pin_to_unit(newA)};
+    }
+    
     Span<float> floats() { return {&r, 4}; }
     Span<const float> floats() const { return {&r, 4}; }
     
@@ -64,12 +68,15 @@ static inline Color operator*(const Color& a, float s) {
 static inline Color operator*(float s, const Color& a) { return a * s; }
 
 
-constexpr Color Color_black = {0,0,0,1};
-constexpr Color Color_gray  = {0.5f,0.5f,0.5f,1};
-constexpr Color Color_white = {1,1,1,1};
-constexpr Color Color_red   = {1,0,0,1};
-constexpr Color Color_green = {0,1,0,1};
-constexpr Color Color_blue  = {0,0,1,1};
+constexpr Color Color_black   = {0,0,0,1};
+constexpr Color Color_gray    = {0.5f,0.5f,0.5f,1};
+constexpr Color Color_white   = {1,1,1,1};
+constexpr Color Color_red     = {1,0,0,1};
+constexpr Color Color_green   = {0,1,0,1};
+constexpr Color Color_blue    = {0,0,1,1};
+constexpr Color Color_cyan    = {0,1,1,1};
+constexpr Color Color_magenta = {1,0,1,1};
+constexpr Color Color_yellow  = {1,1,0,1};
 
 } // namespace
 

@@ -136,6 +136,23 @@ class Textline2Content : public Content {
         }
         return false;
     }
+    
+    bool setAnimSpeed(const Meta& m, Meta*) {
+        m_animator.speed(m.findFloat("speed", m_animator.speed()));
+        return true;
+    }
+    
+    bool playPauseAnimation(const Meta& m, Meta*) {
+        if (m.hasInts("play")) {
+            if (m.findInt("play") != 0) {
+                m_animator.run();
+            } else {
+                m_animator.stop();
+            }
+            return true;
+        }
+        return false;
+    }
 
     bool getFontAxesInfo(const Meta&, Meta* reply) {
         MemoryWriter w;
@@ -196,6 +213,8 @@ public:
             {"set-sample-text", &Textline2Content::setSampleText},
             {"set-font-data", &Textline2Content::setFontData},
             {"set-text-size", &Textline2Content::setTextSize},
+            {"set-anim-speed", &Textline2Content::setAnimSpeed},
+            {"play-pause-animation", &Textline2Content::playPauseAnimation},
             {"get-font-axes-json", &Textline2Content::getFontAxesInfo},
         };
         for (const auto& h : handlers) {

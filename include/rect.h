@@ -82,15 +82,16 @@ struct Rect {
     
     Size size() const { return {this->width(), this->height()}; }
 
-    Rect offset(float dx, float dy) const {
+    PENTREK_WARN_UNUSED_RESULT Rect offset(float dx, float dy) const {
         return {left + dx, top + dy, right + dx, bottom + dy};
     }
-    Rect inset(float dx, float dy) const {
+    PENTREK_WARN_UNUSED_RESULT Rect offset(Point d) const { return this->offset(d.x, d.y); }
+    PENTREK_WARN_UNUSED_RESULT Rect inset(float dx, float dy) const {
         return {left + dx, top + dy, right - dx, bottom - dy};
     }
     
-    IRect round() const;
-    IRect roundOut() const;
+    PENTREK_WARN_UNUSED_RESULT IRect round() const;
+    PENTREK_WARN_UNUSED_RESULT IRect roundOut() const;
 
     bool contains(float x, float y) const {
         return left <= x && x < right &&
@@ -106,7 +107,9 @@ struct Rect {
             std::max(a.bottom, b.bottom),
         };
     }
-    Rect join(const Rect& o) const { return Join(*this, o); }
+    PENTREK_WARN_UNUSED_RESULT Rect join(const Rect& o) const { return Join(*this, o); }
+
+    void toQuad(Point p[4]) const;  // LT RT RB LB
 
     static Rect Empty() { return {0, 0, 0, 0}; }
 
@@ -126,6 +129,10 @@ struct Rect {
         return {pos.x, pos.y, pos.x + size.width, pos.y + size.height};
     }
     
+    static Rect Bounds(Point a, Point b) {
+        Point tmp[2] = {a, b};
+        return Bounds(tmp);
+    }
     static Rect Bounds(Span<const Point>);
 };
 

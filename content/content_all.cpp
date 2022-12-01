@@ -6,6 +6,7 @@
 
 using namespace pentrek;
 
+std::unique_ptr<Content> MakeRRectContent();
 std::unique_ptr<Content> MakeScribble();
 std::unique_ptr<Content> MakeFollowPath();
 std::unique_ptr<Content> MakeTrimContent();
@@ -21,11 +22,14 @@ std::unique_ptr<Content> MakeTextline2Content();
 std::unique_ptr<Content> MakeMouseOverContent();
 std::unique_ptr<Content> MakeTextOnPathContent();
 std::unique_ptr<Content> MakeSnakeContent();
+std::unique_ptr<Content> MakeTEContent();
 
 using ContentMaker = std::unique_ptr<pentrek::Content> (*)();
 
 const ContentMaker makers[] = {
 #ifdef PENTREK_BUILD_FOR_APPLE
+    MakeTEContent,
+    MakeRRectContent,
     MakeScribble,
     MakeFollowPath,
     MakeTrimContent,

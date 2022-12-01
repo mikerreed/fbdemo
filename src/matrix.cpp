@@ -130,3 +130,9 @@ Rect Rect::Bounds(Span<const Point> pts) {
     return pentrek::Rect{l, t, r, b};
 }
 
+void Rect::toQuad(Point p[4]) const {
+    p[0] = {left, top};
+    p[1] = {right, top};
+    p[2] = {right, bottom};
+    p[3] = {left, bottom};
+}

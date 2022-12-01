@@ -104,6 +104,21 @@
         Module._free(wasmVals);
     }
     
+    function query_only_public_axes() {
+        return document.getElementById('only_public_axes').checked;
+    }
+    
+    function restrict_to_public_axes(orig_axes) {
+        const N = orig_axes.length;
+        const axes = [];
+        for (let i = 0; i < N; ++i) {
+            if (all_lower_case(orig_axes[i].tag)) {
+                axes.push(orig_axes[i]);
+            }
+        }
+        return axes;
+    }
+    
     function set_sample_text(str) {
         const wasmPtr = ptrk_string_to_utf8_wasm(str);
         Module.dispatch_set_sample_text(wasmPtr);
@@ -115,9 +130,11 @@
         
         current_font_axes = JSON.parse(str)["axes"];
         
-        compute_hyper_cube_keyframes(current_font_axes);
+        const only_public = query_only_public_axes();
         
-        rebuild_var_sliders(current_font_axes);
+        compute_hyper_cube_keyframes(current_font_axes, only_public);
+        
+        rebuild_var_sliders(current_font_axes, only_public);
     }
     
     function str_trim(str, tail) {
@@ -147,12 +164,22 @@
         clear_and_draw();
     }
     
-    function compute_hyper_cube_keyframes(axes) {
+    function all_lower_case(str) {
+        const islc = (str == str.toLowerCase());
+    //    console.log(str, str.toLowerCase(), islc);
+        return islc;
+    }
+    
+    function compute_hyper_cube_keyframes(axes, only_public_axes) {
+        if (only_public_axes) {
+            axes = restrict_to_public_axes(axes);
+        }
+
         const N = axes.length;
         if (N == 0) {
             return;
         }
-
+        
         const frameCount = 1 << N;
         const duration = Math.sqrt(frameCount);
         const dtime = duration / (frameCount - 1);
@@ -197,6 +224,16 @@
     function handle_set_text_size(ev) {
         Module.dispatch_set_text_size(parseFloat(ev.target.value));
     }
+    function handle_set_anim_speed(ev) {
+        const value = parseFloat(ev.target.value);
+        let speed = 1;
+        if (value > 0) {
+            speed *= (1 + value);
+        } else if (value < 0) {
+            speed /= (1 - value);
+        }
+        Module.dispatch_set_anim_speed(speed * speed);
+    }
     function handle_set_axis_value(ev) {
         console.log('set axis value', ev.target.value, ev.target._axisIndex);
     }
@@ -227,18 +264,30 @@
     </style>
     
     <controls_area>
+        <vstack>
+        <input type="checkbox" id='only_public_axes' name='only_public_axes' checked/>
+        <label for="only_public_axes">Only Public Axes</label>
         <controls>
             <input type="range"/>
         </controls>
+        </vstack>
         <vstack>
             <div>
             <canvas id='myCanvas' width='800' height='600' />
             </div>
+            <button id="play_pause">Play</button>
             <input type="color" id='color_picker' />
+
             <input type="checkbox" id='show_outlines' name='show_outlines' />
             <label for="show_outlines">Points </label>
+
             <input type="text" id='sample_text' placeholder='Sample Text'/>
-            <input type="range" id='set-text-size' min='36' max='450' value='100' />
+
+            <input type="range" id='set-text-size' name='set-text-size' min='36' max='450' value='100' />
+            <label for="set-text-size">Size</label>
+
+            <input type="range" id='set-anim-speed' name='set-anim-speed' min='-4' max='4' value='0' step='any' />
+            <label for="set-anim-speed">Speed</label>
         </vstack>
     </controls_area>
 
@@ -267,7 +316,7 @@
                     return;
                 }
                 previous_raf_timestamp = timestamp;
-                console.log('fps', 1000.0 / duration);
+            //    console.log('fps', 1000.0 / duration);
             }
 
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -314,10 +363,26 @@
                     clear_and_draw();
                 });
                 
+                document.getElementById('only_public_axes').addEventListener('change', load_font_axes);
                 document.getElementById('show_outlines').addEventListener('input', handle_show_outlines);
                 document.getElementById('color_picker').addEventListener('input', handle_set_color);
                 document.getElementById('sample_text').addEventListener('input', handle_set_sampletext);
                 document.getElementById('set-text-size').addEventListener('input', handle_set_text_size);
+                document.getElementById('set-anim-speed').addEventListener('input', handle_set_anim_speed);
+
+                const button = document.getElementById('play_pause');
+                button.is_playing = false;
+                button.addEventListener('click', () => {
+                    const self = document.getElementById('play_pause');
+                    self.is_playing = !self.is_playing;
+                    
+                    Module.dispatch_play_pause_animation(self.is_playing);
+                    if (self.is_playing) {
+                        self.innerHTML = "Pause";
+                    } else {
+                        self.innerHTML = "Play";
+                    }
+                });
 
                 clear_and_draw();
             }
@@ -334,11 +399,15 @@
                 array[0].remove();
             }
         }
-        function rebuild_var_sliders(axes) {
+        function rebuild_var_sliders(axes, only_public_axes) {
             const controls = document.querySelector("controls");
             remove_all(controls, "input");
             remove_all(controls, "label");
             remove_all(controls, "br");
+
+            if (only_public_axes) {
+                axes = restrict_to_public_axes(axes);
+            }
 
             const N = axes.length;
             for (let i = 0; i < N; ++i) {

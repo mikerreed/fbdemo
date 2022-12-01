@@ -43,6 +43,16 @@
     #endif
 #endif
 
+#if defined(PENTREK_BUILD_FOR_WIN) && !defined(__clang__)
+    #if !defined(PENTREK_WARN_UNUSED_RESULT)
+        #define PENTREK_WARN_UNUSED_RESULT
+    #endif
+#endif
+
+#if !defined(PENTREK_WARN_UNUSED_RESULT)
+    #define PENTREK_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#endif
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
