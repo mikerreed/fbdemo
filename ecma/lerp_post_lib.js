@@ -1,3 +1,5 @@
+/* jshint esversion: 11, browser: true, unused:true, undef:true, laxcomma: true, laxbreak: true, devel: true */
+
 // Return the color32 as a hex string with a leading '#' -- for css
 function ptrk_util_color32_to_string(c) {
     // color32 is argb, but the css color string wants rgba, so we rotate
@@ -20,7 +22,7 @@ function ptrk_path_make(ptsptr, npts, vbsptr, nvbs) {
     const path = new Path2D();
 
     let index = 0;
-    for (i = 0; i < nvbs; ++i) {
+    for (let i = 0; i < nvbs; ++i) {
         switch (vbs[i]) {
             case 0:
                 path.moveTo(pts[index+0], pts[index+1]);

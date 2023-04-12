@@ -24,7 +24,7 @@ function _ptrk_drag_drop(e, file_handler) {
 //
 // Installs drag&drop on an element: handler(file)
 //
-function ptrk_install_drag_drop(elem, handler) {
+export function ptrk_install_drag_drop(elem, handler) {
    elem.addEventListener('dragenter', _ptrk_drag_enter, false);
    elem.addEventListener('dragover',  _ptrk_drag_over, false);
    elem.addEventListener('drop', (evt) => {
@@ -35,7 +35,7 @@ function ptrk_install_drag_drop(elem, handler) {
 //
 // Converts a file into a binary array: handler(file_name, array_buffer)
 //
-function ptrk_read_file_into_array(file, handler) {
+export function ptrk_read_file_into_array(file, handler) {
     let reader = new FileReader();
     reader.onload = function() {
         handler(file.name, reader.result);
